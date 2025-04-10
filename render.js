@@ -46,7 +46,7 @@ class Position3D {
         let zDiff = this.z-currentCamera.pos.z;
         let focalLength = window.innerWidth/2;
         let focalHeight = window.innerHeight/2;
-        return new Position2D(focalLength + (xDiff / (zDiff / focalLength)), focalHeight - yDiff / (zDiff / focalLength));
+        return new Position2D(focalLength + (xDiff*currentCamera.yCos - zDiff*currentCamera.ySin) / (yDiff*currentCamera.xSin + (xDiff*currentCamera.ySin + zDiff*currentCamera.yCos)*currentCamera.xCos) * focalLength, focalHeight - ((yDiff*currentCamera.xCos) - (xDiff*currentCamera.ySin + zDiff*currentCamera.yCos)*currentCamera.xSin) / (yDiff*currentCamera.xSin + (xDiff*currentCamera.ySin + zDiff*currentCamera.yCos)*currentCamera.xCos) * focalLength);
     }
 
     distanceFrom(position){
@@ -89,8 +89,8 @@ class Triangle {
         ctx.closePath();
         ctx.fillStyle = this.col.toStyleString();
         ctx.fill();
-        ctx.fillStyle = 'white';
-        ctx.fillRect(this.center.castTo2D().x, this.center.castTo2D().y, 10, 10);
+        //ctx.fillStyle = 'white';
+        //ctx.fillRect(this.center.castTo2D().x, this.center.castTo2D().y, 10, 10);
     }
 
     findClosestVertexTo(position){
@@ -150,7 +150,7 @@ const renderTools = {
         for(let i = 0; i < triangles.length; i++){
             let j = i-1;
             let item = triangles[i]
-            while(j >= 0 && triangles[j].center.distanceFrom(currentCamera.pos) > item.center.distanceFrom(currentCamera.pos)){
+            while(j >= 0 && triangles[j].center.distanceFrom(currentCamera.pos) > item.center.distanceFrom(currentCamera.pos) && triangles[j].center.distanceFrom(currentCamera.pos) < currentCamera.maxClippingDistance){
                 triangles[j+1] = triangles[j];
                 j--;
             }
@@ -162,10 +162,12 @@ const renderTools = {
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
         this.sortTriangles();
         for(let i = triangles.length-1; i >= 0; i--){
-            triangles[i].render();
+            if(triangles[i].center.distanceFrom(currentCamera.pos) < currentCamera.maxClippingDistance){
+                triangles[i].render();
+            }
         };
     }
 
 };
 
-export {renderTools, Color, Position2D, Position3D, Triangle};
+export {renderTools, canvas, Color, Position2D, Position3D, Triangle};
