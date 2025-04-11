@@ -2,7 +2,7 @@ import { renderTools, Color, Position2D, Position3D, Triangle, canvas } from "./
 import { Camera } from "./camera.js";
 
 const keysDown = {};
-let currentCamera = new Camera(new Position3D(0, 0, 0), 0, 0, 10, 1000);
+let currentCamera = new Camera(new Position3D(0, 0, 0), 0, 0, 2, 1000);
 const Mouse = {x:0, y:0, down:false, DX:0, DY:0};
 
 window.addEventListener("keydown", (event) => {

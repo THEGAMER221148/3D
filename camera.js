@@ -23,7 +23,7 @@ class Camera {
 
         this.pos.z += keysDown.w? this.yCos*this.flySpeed: keysDown.s? -this.yCos*this.flySpeed : keysDown.a? -this.ySin*this.flySpeed: keysDown.d? this.ySin*this.flySpeed: 0;
         this.pos.x += keysDown.w? this.ySin*this.flySpeed: keysDown.s? -this.ySin*this.flySpeed : keysDown.a? this.yCos*this.flySpeed: keysDown.d? -this.yCos*this.flySpeed: 0;
-        this.pos.y += keysDown.e? 10: keysDown.q? -10 : 0;//keysDown.w? this.xCos*this.flySpeed : keysDown.s? -this.xCos*this.flySpeed : 0;
+        this.pos.y += keysDown.e? this.flySpeed: keysDown.q? -this.flySpeed : 0;//keysDown.w? this.xCos*this.flySpeed : keysDown.s? -this.xCos*this.flySpeed : 0;
     }
 }
 

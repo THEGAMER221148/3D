@@ -46,7 +46,7 @@ class Position3D {
         let zDiff = this.z-currentCamera.pos.z;
         let focalLength = window.innerWidth/2;
         let focalHeight = window.innerHeight/2;
-        return new Position2D(focalLength + (xDiff*currentCamera.yCos - zDiff*currentCamera.ySin) / (yDiff*currentCamera.xSin + (xDiff*currentCamera.ySin + zDiff*currentCamera.yCos)*currentCamera.xCos) * focalLength, focalHeight - ((yDiff*currentCamera.xCos) - (xDiff*currentCamera.ySin + zDiff*currentCamera.yCos)*currentCamera.xSin) / (yDiff*currentCamera.xSin + (xDiff*currentCamera.ySin + zDiff*currentCamera.yCos)*currentCamera.xCos) * focalLength);
+        return {screenPosition: new Position2D(focalLength + (xDiff*currentCamera.yCos - zDiff*currentCamera.ySin) / (yDiff*currentCamera.xSin + (xDiff*currentCamera.ySin + zDiff*currentCamera.yCos)*currentCamera.xCos) * focalLength, focalHeight - ((yDiff*currentCamera.xCos) - (xDiff*currentCamera.ySin + zDiff*currentCamera.yCos)*currentCamera.xSin) / (yDiff*currentCamera.xSin + (xDiff*currentCamera.ySin + zDiff*currentCamera.yCos)*currentCamera.xCos) * focalLength), inBounds: (yDiff*currentCamera.xSin + (xDiff*currentCamera.ySin + zDiff*currentCamera.yCos)*currentCamera.xCos) * focalLength < 0? true : false};
     }
 
     distanceFrom(position){
@@ -82,15 +82,17 @@ class Triangle {
     }
 
     render(){
-        ctx.beginPath();
-        ctx.moveTo(this.v1.castTo2D().x, this.v1.castTo2D().y);
-        ctx.lineTo(this.v2.castTo2D().x, this.v2.castTo2D().y);
-        ctx.lineTo(this.v3.castTo2D().x, this.v3.castTo2D().y);
-        ctx.closePath();
-        ctx.fillStyle = this.col.toStyleString();
-        ctx.fill();
+        if(this.v1.castTo2D().inBounds && this.v2.castTo2D().inBounds && this.v3.castTo2D().inBounds){
+            ctx.beginPath();
+            ctx.moveTo(this.v1.castTo2D().screenPosition.x, this.v1.castTo2D().screenPosition.y);
+            ctx.lineTo(this.v2.castTo2D().screenPosition.x, this.v2.castTo2D().screenPosition.y);
+            ctx.lineTo(this.v3.castTo2D().screenPosition.x, this.v3.castTo2D().screenPosition.y);
+            ctx.closePath();
+            ctx.fillStyle = this.col.toStyleString();
+            ctx.fill();
+        }
         //ctx.fillStyle = 'white';
-        //ctx.fillRect(this.center.castTo2D().x, this.center.castTo2D().y, 10, 10);
+        //ctx.fillRect(this.center.castTo2D().screenPosition.x, this.center.castTo2D().screenPosition.y, 10, 10);
     }
 
     findClosestVertexTo(position){
