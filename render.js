@@ -82,11 +82,14 @@ class Triangle {
     }
 
     render(){
-        if(this.v1.castTo2D().inBounds && this.v2.castTo2D().inBounds && this.v3.castTo2D().inBounds){
+        if(this.v1.castTo2D().inBounds || this.v2.castTo2D().inBounds || this.v3.castTo2D().inBounds){
             ctx.beginPath();
-            ctx.moveTo(this.v1.castTo2D().screenPosition.x, this.v1.castTo2D().screenPosition.y);
-            ctx.lineTo(this.v2.castTo2D().screenPosition.x, this.v2.castTo2D().screenPosition.y);
-            ctx.lineTo(this.v3.castTo2D().screenPosition.x, this.v3.castTo2D().screenPosition.y);
+            let vCast = this.v1.castTo2D();
+            ctx.moveTo(vCast.screenPosition.x, vCast.screenPosition.y);
+            vCast = this.v2.castTo2D();
+            ctx.lineTo(vCast.screenPosition.x, vCast.screenPosition.y);
+            vCast = this.v3.castTo2D();
+            ctx.lineTo(vCast.screenPosition.x, vCast.screenPosition.y);
             ctx.closePath();
             ctx.fillStyle = this.col.toStyleString();
             ctx.fill();
@@ -100,24 +103,36 @@ class Triangle {
         return dist == this.v1.distanceFrom(position)? this.v1 : dist == this.v2.distanceFrom(position)? this.v2 : this.v3;
     }
 
+    getAverageZInViewSpace() {
+        const v1 = this.v1.minus(currentCamera.pos);
+        const v2 = this.v2.minus(currentCamera.pos);
+        const v3 = this.v3.minus(currentCamera.pos);
+    
+        const z1 = v1.y * currentCamera.xSin + (v1.x * currentCamera.ySin + v1.z * currentCamera.yCos) * currentCamera.xCos;
+        const z2 = v2.y * currentCamera.xSin + (v2.x * currentCamera.ySin + v2.z * currentCamera.yCos) * currentCamera.xCos;
+        const z3 = v3.y * currentCamera.xSin + (v3.x * currentCamera.ySin + v3.z * currentCamera.yCos) * currentCamera.xCos;
+    
+        return (z1 + z2 + z3) / 3;
+    }
+
 }
 
 let screenCenter;
 
 let triangles = [
-    new Triangle(new Position3D(0, 0, 0), new Position3D(100, 0, 0), new Position3D(100, 100, 0), new Color(0, 0, 255)),
-    new Triangle(new Position3D(0, 0, 0), new Position3D(0, 100, 0), new Position3D(100, 100, 0), new Color(0, 0, 128)),
-    new Triangle(new Position3D(0, 100, 0), new Position3D(100, 100, 0), new Position3D(100, 100, 100), new Color(0, 255, 0)),
-    new Triangle(new Position3D(0, 100, 0), new Position3D(0, 100, 100), new Position3D(100, 100, 100), new Color(0, 128, 0)),
-    new Triangle(new Position3D(0, 0, 0), new Position3D(0, 0, 100), new Position3D(0, 100, 100), new Color(255, 0, 0)),
-    new Triangle(new Position3D(0, 0, 0), new Position3D(0, 100, 0), new Position3D(0, 100, 100), new Color(128, 0, 0)),
+    new Triangle(new Position3D(0, 0, 0), new Position3D(1, 0, 0), new Position3D(1, 1, 0), new Color(0, 0, 255)),
+    new Triangle(new Position3D(0, 0, 0), new Position3D(0, 1, 0), new Position3D(1, 1, 0), new Color(0, 0, 128)),
+    new Triangle(new Position3D(0, 1, 0), new Position3D(1, 1, 0), new Position3D(1, 1, 1), new Color(0, 255, 0)),
+    new Triangle(new Position3D(0, 1, 0), new Position3D(0, 1, 1), new Position3D(1, 1, 1), new Color(0, 128, 0)),
+    new Triangle(new Position3D(0, 0, 0), new Position3D(0, 0, 1), new Position3D(0, 1, 1), new Color(255, 0, 0)),
+    new Triangle(new Position3D(0, 0, 0), new Position3D(0, 1, 0), new Position3D(0, 1, 1), new Color(128, 0, 0)),
 
-    new Triangle(new Position3D(0, 0, 100), new Position3D(100, 0, 100), new Position3D(100, 100, 100), new Color(255, 255, 0)),
-    new Triangle(new Position3D(0, 0, 100), new Position3D(0, 100, 100), new Position3D(100, 100, 100), new Color(128, 128, 0)),
-    new Triangle(new Position3D(0, 0, 0), new Position3D(100, 0, 0), new Position3D(100, 0, 100), new Color(255, 0, 255)),
-    new Triangle(new Position3D(0, 0, 0), new Position3D(0, 0, 100), new Position3D(100, 0, 100), new Color(128, 0, 128)),
-    new Triangle(new Position3D(100, 0, 0), new Position3D(100, 0, 100), new Position3D(100, 100, 100), new Color(0, 255, 255)),
-    new Triangle(new Position3D(100, 0, 0), new Position3D(100, 100, 0), new Position3D(100, 100, 100), new Color(0, 128, 128)),
+    new Triangle(new Position3D(0, 0, 1), new Position3D(1, 0, 1), new Position3D(1, 1, 1), new Color(255, 255, 0)),
+    new Triangle(new Position3D(0, 0, 1), new Position3D(0, 1, 1), new Position3D(1, 1, 1), new Color(128, 128, 0)),
+    new Triangle(new Position3D(0, 0, 0), new Position3D(1, 0, 0), new Position3D(1, 0, 1), new Color(255, 0, 255)),
+    new Triangle(new Position3D(0, 0, 0), new Position3D(0, 0, 1), new Position3D(1, 0, 1), new Color(128, 0, 128)),
+    new Triangle(new Position3D(1, 0, 0), new Position3D(1, 0, 1), new Position3D(1, 1, 1), new Color(0, 255, 255)),
+    new Triangle(new Position3D(1, 0, 0), new Position3D(1, 1, 0), new Position3D(1, 1, 1), new Color(0, 128, 128)),
 ];
 
 const renderTools = {
@@ -149,15 +164,9 @@ const renderTools = {
     },
 
     sortTriangles(){
-        for(let i = 0; i < triangles.length; i++){
-            let j = i-1;
-            let item = triangles[i]
-            while(j >= 0 && triangles[j].center.distanceFrom(currentCamera.pos) > item.center.distanceFrom(currentCamera.pos) && triangles[j].center.distanceFrom(currentCamera.pos) < currentCamera.maxClippingDistance){
-                triangles[j+1] = triangles[j];
-                j--;
-            }
-            triangles[j+1] = item;
-        }
+        triangles.sort((a, b) => {
+            return a.center.distanceFrom(currentCamera.pos) - b.center.distanceFrom(currentCamera.pos);
+        });
     },
 
     renderEnvironment(){
